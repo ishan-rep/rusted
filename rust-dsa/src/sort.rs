@@ -3,7 +3,7 @@ mergesort - recursive function. End is exclusive.
 */
 pub fn mergesort<T: Ord + Clone>(inp_array: Vec<T>, start: usize, end: usize) -> Vec<T> {
     // 2 arrays - start to mid (exclusive) & mid to end (exclusive)
-    if start >= end - 1 {
+    if start + 1 >= end {
         return inp_array;
     }
     let mid = start + (end-start)/2;
@@ -49,41 +49,80 @@ fn merge<T: Ord + Clone>(arr_first_half: Vec<T>, arr_second_half: Vec<T>) -> Vec
 
 // end is exclusive
 pub fn quicksort<T: Ord + Clone + std::fmt::Debug>(mut inp_array: Vec<T>, start: usize, end: usize) -> Vec<T> {
-    if start >= end - 1 {
+    if start + 1 >= end {
         return inp_array;
     }
-
-
     let pivot = end-1;
-    println!("pivot : {:?}", inp_array[pivot]);
 
     let mut i = start;
     let mut j = end-2;
-    let mut temp;
+
 
     // Go till 
-    while i <= j {
-        if inp_array[i] < inp_array[pivot] {
+    while i <= j && j > 0 {
+        if inp_array[i] <= inp_array[pivot] {
             i += 1;
             continue;
         }
-        else if inp_array[i] >= inp_array[pivot] {
-            temp = inp_array[j].clone();
-            inp_array[j] = inp_array[i].clone();
-            inp_array[i] = temp;
+        else if inp_array[i] > inp_array[pivot] {
+            inp_array.swap(i, j);
             j -= 1;
             continue;
         }
     }
-    println!("Array is: {:?}", inp_array);
-
-    temp = inp_array[i].clone();
-    inp_array[i] = inp_array[pivot].clone();
-    inp_array[pivot] = temp;
-
-    println!("Array is: {:?}", inp_array);
-
+    inp_array.swap(i, pivot);
     inp_array = quicksort(inp_array, start, i);
     inp_array = quicksort(inp_array, i, end);
     return inp_array;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*; // This brings the quicksort and mergesort functions into scope.
+
+    #[test]
+    fn test_quicksort_empty() {
+        let input: Vec<i32> = vec![];
+        let result = quicksort(input.clone(), 0, input.len());
+        assert_eq!(result, input);
+    }
+
+    #[test]
+    fn test_quicksort_single_element() {
+        let input = vec![1];
+        let result = quicksort(input.clone(), 0, input.len());
+        assert_eq!(result, input);
+    }
+
+    #[test]
+    fn test_quicksort_multiple_elements() {
+        let input = vec![3, 2, 5, 1, 4];
+        let expected = vec![1, 2, 3, 4, 5];
+        let result = quicksort(input.clone(), 0, input.len());
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_mergesort_empty() {
+        let input: Vec<i32> = vec![];
+        let result = mergesort(input.clone(), 0, input.len());
+        assert_eq!(result, input);
+    }
+
+    #[test]
+    fn test_mergesort_single_element() {
+        let input = vec![1];
+        let result = mergesort(input.clone(), 0, input.len());
+        assert_eq!(result, input);
+    }
+
+    #[test]
+    fn test_mergesort_multiple_elements() {
+        let input = vec![3, 2, 5, 1, 4];
+        let expected = vec![1, 2, 3, 4, 5];
+        let result = mergesort(input.clone(), 0, input.len());
+        assert_eq!(result, expected);
+    }
+
+    // Additional edge case tests can be added here...
 }
